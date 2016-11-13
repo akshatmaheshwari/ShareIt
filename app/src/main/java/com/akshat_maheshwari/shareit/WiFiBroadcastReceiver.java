@@ -9,7 +9,10 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 /**
  * Created by Akshat Maheshwari on 02-10-2016.
@@ -45,22 +48,26 @@ public class WiFiBroadcastReceiver extends BroadcastReceiver {
                 wifiP2pManager.requestPeers(channel, new PeerListListener() {
                     @Override
                     public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
-                        WifiP2pDevice wifiP2pDevice = (WifiP2pDevice) wifiP2pDeviceList.getDeviceList().toArray()[0];
-                        WifiP2pConfig wifiP2pConfig = new WifiP2pConfig();
-                        wifiP2pConfig.deviceAddress = wifiP2pDevice.deviceAddress;
-                        wifiP2pManager.connect(channel, wifiP2pConfig, new WifiP2pManager.ActionListener() {
-                            @Override
-                            public void onSuccess() {
-                                System.out.println("Connection successful");
-                                Toast.makeText(context, "Connection successful", Toast.LENGTH_SHORT).show();
-                            }
+                        mainActivity.peerListAdapter = new PeerListAdapter(mainActivity.getApplicationContext(), R.layout.peer_list_item, new ArrayList<>(wifiP2pDeviceList.getDeviceList()));
+                        mainActivity.lvPeers.setAdapter(mainActivity.peerListAdapter);
+//                        if (wifiP2pDeviceList.getDeviceList().toArray().length > 0) {
+                            /*WifiP2pDevice wifiP2pDevice = (WifiP2pDevice) wifiP2pDeviceList.getDeviceList().toArray()[0];
+                            WifiP2pConfig wifiP2pConfig = new WifiP2pConfig();
+                            wifiP2pConfig.deviceAddress = wifiP2pDevice.deviceAddress;
+                            wifiP2pManager.connect(channel, wifiP2pConfig, new WifiP2pManager.ActionListener() {
+                                @Override
+                                public void onSuccess() {
+                                    System.out.println("Connection successful");
+//                                Toast.makeText(context, "Connection successful", Toast.LENGTH_SHORT).show();
+                                }
 
-                            @Override
-                            public void onFailure(int i) {
-                                System.out.println("Connection failed");
-                                Toast.makeText(context, "Connection failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                                @Override
+                                public void onFailure(int i) {
+                                    System.out.println("Connection failed");
+                                    Toast.makeText(context, "Connection failed", Toast.LENGTH_SHORT).show();
+                                }
+                            });*/
+//                        }
                     }
                 });
             }

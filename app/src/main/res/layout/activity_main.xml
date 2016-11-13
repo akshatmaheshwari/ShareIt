@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,16 +7,27 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <Button
-        android:layout_width="wrap_content"
+        android:text="Send"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Click Me"
-        android:id="@+id/bClick" />
+        android:id="@+id/bSend"
+        android:layout_alignParentRight="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <Button
+        android:text="Receive"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tvResult" />
-</LinearLayout>
+        android:layout_below="@+id/bSend"
+        android:id="@+id/bReceive" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/bReceive"
+        android:layout_marginTop="10dp"
+        android:id="@+id/lvPeers" />
+</RelativeLayout>
