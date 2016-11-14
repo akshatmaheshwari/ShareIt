@@ -2,6 +2,7 @@ package com.akshat_maheshwari.shareit;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -67,6 +68,17 @@ public class MainActivity extends AppCompatActivity {
 //                        Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+        });
+
+        bReceive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, DisplayFilesActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("directoryPath", "/sdcard");
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
 

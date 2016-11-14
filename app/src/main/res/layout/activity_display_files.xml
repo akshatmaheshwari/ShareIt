@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_display_files"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.akshat_maheshwari.shareit.DisplayFilesActivity">
+
+    <TextView
+        android:id="@+id/tvFolderEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Folder is empty"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:visibility="invisible" />
+
+    <ListView
+        android:id="@+id/lvFiles"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</RelativeLayout>
