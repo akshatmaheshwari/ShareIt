@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_peer_chooser"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.akshat_maheshwari.shareit.PeerChooserActivity">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lvPeers"
+        android:layout_above="@+id/bCancel" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/tvDevicesStatus"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:visibility="invisible" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bCancel"
+        android:text="Cancel"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>

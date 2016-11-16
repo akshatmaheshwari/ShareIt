@@ -2,12 +2,17 @@ package com.akshat_maheshwari.shareit;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,6 +48,7 @@ public class FileListAdapter extends ArrayAdapter<File> {
         if (file != null) {
             TextView tvFileName = (TextView) v.findViewById(R.id.tvFileName);
             ImageView ivFileType = (ImageView) v.findViewById(R.id.ivFileType);
+            CheckBox cbToBeSent = (CheckBox) v.findViewById(R.id.cbToBeSent);
 
             tvFileName.setText(file.getName());
             if (file.isDirectory()) {
@@ -63,22 +69,57 @@ public class FileListAdapter extends ArrayAdapter<File> {
                     }
                 }
             }
+            if (context instanceof DisplayFilesActivity) {
+                if (((DisplayFilesActivity) context).filesToBeSentSet.contains(file)) {
+                    cbToBeSent.setChecked(true);
+                } else {
+                    cbToBeSent.setChecked(false);
+                }
+            }
 
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (file.isDirectory()) {
-                        Intent intent = new Intent(context, DisplayFilesActivity.class);
+                        /*Intent intent = new Intent(context, DisplayFilesActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("directoryPath", file.getAbsolutePath());
                         intent.putExtras(bundle);
-                        context.startActivity(intent);
-                    } else {
+                        context.startActivity(intent);*/
+                        files = ((DisplayFilesActivity) context).getVisibleFiles(file.getAbsolutePath());
+                        ((DisplayFilesActivity) context).currentDirectoryPath = file.getAbsolutePath();
+                        notifyDataSetChanged();
+                    }
+                }
+            });
+
+            cbToBeSent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (context instanceof DisplayFilesActivity && compoundButton.isPressed()/* && !file.isDirectory()*/) {
+                        if (b) {
+                            ((DisplayFilesActivity) context).filesToBeSentSet.add(file);
+                        } else {
+                            if (((DisplayFilesActivity) context).filesToBeSentSet.contains(file)) {
+                                ((DisplayFilesActivity) context).filesToBeSentSet.remove(file);
+                            }
+                        }
+                        if (((DisplayFilesActivity) context).filesToBeSentSet.size() > 0) {
+                            ((DisplayFilesActivity) context).bSend.setEnabled(true);
+                        } else {
+                            ((DisplayFilesActivity) context).bSend.setEnabled(false);
+                        }
+                        ((DisplayFilesActivity) context).bSend.setText("Send (" + ((DisplayFilesActivity) context).filesToBeSentSet.size() + ")");
                     }
                 }
             });
         }
 
         return v;
+    }
+
+    @Override
+    public int getCount() {
+        return files.length;
     }
 }

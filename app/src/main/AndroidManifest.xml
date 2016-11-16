@@ -23,8 +23,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ClientActivity" />
-        <activity android:name=".DisplayFilesActivity" />
+        <activity android:name=".SenderActivity" />
+        <activity
+            android:name=".DisplayFilesActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".PeerChooserActivity"
+            android:parentActivityName=".DisplayFilesActivity" />
+        <activity android:name=".ReceiverActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

@@ -18,5 +18,26 @@
     <ListView
         android:id="@+id/lvFiles"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/llButtons" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/llButtons"
+        android:weightSum="1">
+        <Button
+            android:text="Send (0)"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bSend"
+            android:layout_weight="0.5" />
+        <Button
+            android:text="Cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bCancel"
+            android:layout_weight="0.5" />
+    </LinearLayout>
 </RelativeLayout>
