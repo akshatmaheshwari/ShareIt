@@ -7,21 +7,38 @@
     tools:context="com.akshat_maheshwari.shareit.ReceiverActivity">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvStatus" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/tvWaitingForSender"
+        android:text="Waiting for sender..."
+        android:gravity="center" />
 
-    <Button
-        android:text="Cancel"
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lvStatus"
+        android:layout_above="@+id/llButtons" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:id="@+id/bCancel" />
+        android:id="@+id/llButtons"
+        android:weightSum="1">
 
-    <Button
-        android:text="Done"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/bCancel"
-        android:id="@+id/bDone" />
+        <Button
+            android:text="Done"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:id="@+id/bDone" />
+
+        <Button
+            android:text="Cancel"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bCancel" />
+    </LinearLayout>
 </RelativeLayout>

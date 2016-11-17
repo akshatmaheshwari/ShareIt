@@ -6,15 +6,32 @@
     android:layout_height="match_parent"
     tools:context="com.akshat_maheshwari.shareit.SenderActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvStatus" />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lvStatus"
+        android:layout_above="@+id/llButtons" />
 
-    <Button
-        android:text="Done"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:id="@+id/bDone" />
+        android:id="@+id/llButtons"
+        android:weightSum="1">
+
+        <Button
+            android:text="Done"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:id="@+id/bDone" />
+
+        <Button
+            android:text="Cancel"
+            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bCancel" />
+    </LinearLayout>
 </RelativeLayout>

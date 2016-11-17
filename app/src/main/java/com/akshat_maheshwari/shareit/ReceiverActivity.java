@@ -9,11 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class ReceiverActivity extends AppCompatActivity {
-    TextView tvStatus;
+    ListView lvStatus;
+    TextView tvWaitingForSender;
     Button bCancel, bDone;
 
     WifiP2pManager wifiP2pManager;
@@ -23,12 +25,15 @@ public class ReceiverActivity extends AppCompatActivity {
 
     ReceiverAsyncTask receiverAsyncTask;
 
+    ReceiverFileListAdapter receiverFileListAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receiver);
 
-        tvStatus = (TextView) findViewById(R.id.tvStatus);
+        lvStatus = (ListView) findViewById(R.id.lvStatus);
+        tvWaitingForSender = (TextView) findViewById(R.id.tvWaitingForSender);
         bCancel = (Button) findViewById(R.id.bCancel);
         bDone = (Button) findViewById(R.id.bDone);
 
@@ -67,7 +72,7 @@ public class ReceiverActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int i) {
-                System.out.println("discFailed " + i);
+//                System.out.println("discFailed " + i);
 //                Toast.makeText(getApplicationContext(), "discFailed " + i, Toast.LENGTH_SHORT).show();
                 discoverPeersTillSuccess();
             }

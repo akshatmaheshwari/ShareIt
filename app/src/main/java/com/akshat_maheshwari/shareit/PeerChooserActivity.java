@@ -37,8 +37,6 @@ public class PeerChooserActivity extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
     IntentFilter intentFilter;
 
-    ArrayList<File> filesToBeSent;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +97,7 @@ public class PeerChooserActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int i) {
-                System.out.println("discFailed " + i);
+//                System.out.println("discFailed " + i);
 //                Toast.makeText(getApplicationContext(), "discFailed " + i, Toast.LENGTH_SHORT).show();
                 discoverPeersTillSuccess();
             }

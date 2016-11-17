@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.widget.TextView;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,77 +15,124 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Created by Akshat Maheshwari on 04-10-2016.
  */
-public class ReceiverAsyncTask extends AsyncTask {
+public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
     private Context context;
-    private TextView tvStatus;
 
-    public ReceiverAsyncTask(Context context, TextView tvStatus) {
+    public ReceiverAsyncTask(Context context) {
         this.context = context;
-        this.tvStatus = tvStatus;
-        System.out.println("ctor");
     }
 
     @Override
-    protected Object doInBackground(Object[] objects) {
+    protected Integer doInBackground(Object[] objects) {
+        ServerSocket receiverSocket;
+        Socket senderSocket;
+        int successfulTransfers = 0;
         try {
             /**
              * Create a server socket and wait for client connections. This
              * call blocks until a connection is accepted from a client
              */
             System.out.println("before socket connects");
-            ServerSocket receiverSocket = new ServerSocket(33440);
-            Socket senderSocket = receiverSocket.accept();
+            receiverSocket = new ServerSocket(33440);
+            senderSocket = receiverSocket.accept();
             System.out.println("socket connected");
 
             /**
              * If this code is reached, a client has connected and transferred data
              * Save the input stream from the client as a file
              */
-            final File file = new File(Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/shareit-" + System.currentTimeMillis() + ".jpg");
-            File dirs = new File(file.getParent());
-            if (!dirs.exists()) {
-                dirs.mkdirs();
-            }
-            file.createNewFile();
             InputStream inputStream = senderSocket.getInputStream();
-            copyFile(inputStream, new FileOutputStream(file));
+            DataInputStream dataInputStream = new DataInputStream(inputStream);
+            int noOfFiles = dataInputStream.readInt();
+            System.out.println(noOfFiles);
+            final ArrayList<String> fileNamesArrayList = new ArrayList<>();
+            for (int i = 0; i < noOfFiles; ++i) {
+                String fileName = dataInputStream.readUTF();
+                System.out.println("fileName: " + fileName);
+                fileNamesArrayList.add(fileName);
+            }
+            if (context instanceof ReceiverActivity) {
+                ((ReceiverActivity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((ReceiverActivity) context).receiverFileListAdapter = new ReceiverFileListAdapter(context, R.layout.receiver_file_progress_list_item, fileNamesArrayList);
+                        ((ReceiverActivity) context).lvStatus.setAdapter(((ReceiverActivity) context).receiverFileListAdapter);
+                    }
+                });
+            }
+            for (int i = 0; i < noOfFiles; ++i) {
+                long fileSize = dataInputStream.readLong();
+                System.out.println("fileSize: " + fileSize);
+                final File file = new File(Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/" + fileNamesArrayList.get(i));
+                File dirs = new File(file.getParent());
+                if (!dirs.exists()) {
+                    dirs.mkdirs();
+                }
+                file.createNewFile();
+                final long startTime = System.nanoTime();
+                copyFile(inputStream, new FileOutputStream(file), fileSize, i);
+                if (context instanceof ReceiverActivity) {
+                    final ReceiverFileProgress receiverFileProgress = ((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.get(i);
+                    ((ReceiverActivity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            receiverFileProgress.setTimeTaken(System.nanoTime() - startTime);
+                            receiverFileProgress.setFile(file);
+                            ((ReceiverActivity) context).receiverFileListAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+                System.out.println(file.getAbsolutePath());
+            }
+            dataInputStream.close();
+            inputStream.close();
+            senderSocket.close();
             receiverSocket.close();
-
-            return file.getAbsolutePath();
         } catch (IOException e) {
+            System.out.println(e.toString());
             e.printStackTrace();
         }
-        return null;
+        return successfulTransfers;
     }
 
     @Override
-    protected void onPostExecute(Object o) {
-        if (o != null) {
-            tvStatus.append("File received - " + o + "\n");
-            /*Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.parse("file://" + o), "image*//*");
-            context.startActivity(intent);*/
-        } else {
-            tvStatus.append("Error in receiving file - " + o + "\n");
+    protected void onProgressUpdate(Long... values) {
+        int fileNo = values[0].intValue();
+        long bytesSent = values[1];
+        if (context instanceof ReceiverActivity) {
+            ((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.get(fileNo).setBytesSent(bytesSent);
+            ((ReceiverActivity) context).receiverFileListAdapter.notifyDataSetChanged();
         }
     }
 
-    private void copyFile(InputStream inputStream, FileOutputStream fileOutputStream) {
+    @Override
+    protected void onPostExecute(Integer integer) {
+        if (context instanceof ReceiverActivity) {
+            ((ReceiverActivity) context).bDone.setEnabled(true);
+            ((ReceiverActivity) context).bCancel.setEnabled(false);
+        }
+    }
+
+    private void copyFile(InputStream inputStream, FileOutputStream fileOutputStream, long fileSize, int fileNo) {
         System.out.println("before copyFile");
         byte[] buffer = new byte[1024];
         int len;
+        long bytesSent = 0;
         try {
-            while ((len = inputStream.read(buffer)) != -1) {
+            while (fileSize > 0 && (len = inputStream.read(buffer, 0, (int) Math.min(buffer.length, fileSize))) != -1) {
                 fileOutputStream.write(buffer, 0, len);
+                fileSize -= len;
+                bytesSent += len;
+                publishProgress((long) fileNo, bytesSent);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("before afterFile");
+        System.out.println("after copyFile");
     }
 }
