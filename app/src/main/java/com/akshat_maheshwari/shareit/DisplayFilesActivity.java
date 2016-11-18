@@ -1,6 +1,8 @@
 package com.akshat_maheshwari.shareit;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -119,7 +121,27 @@ public class DisplayFilesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (currentDirectoryPath.equals(Environment.getExternalStorageDirectory().getAbsolutePath())) {
-            super.onBackPressed();
+            if (filesToBeSentSet.size() > 0) {
+                System.out.println(filesToBeSentSet.size());
+                new AlertDialog.Builder(DisplayFilesActivity.this)
+                        .setTitle("Cancel")
+                        .setMessage("Are you sure want to cancel sending the selected files?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                DisplayFilesActivity.super.onBackPressed();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        })
+                        .setIcon(R.drawable.ic_error)
+                        .show();
+            } else {
+                super.onBackPressed();
+            }
         } else {
             fileListAdapter.files = getVisibleFiles(currentDirectoryPath.substring(0, currentDirectoryPath.lastIndexOf('/')));
             currentDirectoryPath = currentDirectoryPath.substring(0, currentDirectoryPath.lastIndexOf('/'));

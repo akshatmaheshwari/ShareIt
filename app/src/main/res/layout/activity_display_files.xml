@@ -20,8 +20,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/hsvFolderScroll"
         android:scrollbarSize="1dip"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp">
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

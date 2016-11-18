@@ -30,7 +30,10 @@
         <activity
             android:name=".PeerChooserActivity"
             android:parentActivityName=".DisplayFilesActivity" />
-        <activity android:name=".ReceiverActivity"
+        <activity
+            android:name=".ReceiverActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity" />
     </application>
 

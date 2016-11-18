@@ -2,23 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:weightSum="1"
+    android:gravity="center_vertical">
 
-    <TextView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tvFileName"
-        android:textColor="#000" />
+        android:id="@+id/ivFileType"
+        android:layout_weight="0.9" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tvFileSentPercentage"
-        android:textColor="#000" />
+        android:orientation="vertical"
+        android:layout_weight="0.1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvFileName"
+            android:textStyle="bold"
+            android:textColor="#000" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvTimeTaken"
-        android:textColor="#000" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvFileSentPercentage"
+            android:textColor="#000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvTimeTaken"
+            android:textColor="#000" />
+    </LinearLayout>
 </LinearLayout>

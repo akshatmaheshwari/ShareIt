@@ -11,9 +11,11 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 /**
@@ -47,6 +49,7 @@ public class ReceiverFileListAdapter extends ArrayAdapter<String> {
         TextView tvFileName = (TextView) view.findViewById(R.id.tvFileName);
         TextView tvFileReceivedPercentage = (TextView) view.findViewById(R.id.tvFileReceivedPercentage);
         TextView tvTimeTaken = (TextView) view.findViewById(R.id.tvTimeTaken);
+        ImageView ivFileType = (ImageView) view.findViewById(R.id.ivFileType);
         Button bViewFile = (Button) view.findViewById(R.id.bViewFile);
 
         final ReceiverFileProgress receiverFileProgress = receiverFileProgressArrayList.get(position);
@@ -57,22 +60,44 @@ public class ReceiverFileListAdapter extends ArrayAdapter<String> {
             System.out.println("ad: " + receiverFileProgress.getFile() == null);
             if (receiverFileProgress.getFile() != null) {
                 tvFileReceivedPercentage.setText((receiverFileProgress.getBytesSent() / receiverFileProgress.getFile().length()) * 100 + "% received");
-                bViewFile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Uri path = Uri.fromFile(receiverFileProgress.getFile());
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.setDataAndType(path, getMimeType(receiverFileProgress.getFile().getAbsolutePath()));
-                        try {
-                            context.startActivity(intent);
-                        } catch (ActivityNotFoundException e) {
-                            System.out.println(e.toString());
-                            e.printStackTrace();
+                if (!receiverFileProgress.getFile().isDirectory()) {
+                    bViewFile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Uri path = Uri.fromFile(receiverFileProgress.getFile());
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setDataAndType(path, getMimeType(receiverFileProgress.getFile().getAbsolutePath()));
+                            try {
+                                context.startActivity(intent);
+                            } catch (ActivityNotFoundException e) {
+                                System.out.println(e.toString());
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    bViewFile.setEnabled(true);
+                } else {
+                    bViewFile.setVisibility(View.INVISIBLE);
+                }
+                if (receiverFileProgress.getFile().isDirectory()) {
+                    ivFileType.setImageResource(R.drawable.ic_folder);
+                } else {
+                    String extension = URLConnection.guessContentTypeFromName(receiverFileProgress.getFile().getName());
+                    if (extension == null) {
+                        ivFileType.setImageResource(R.drawable.ic_style);
+                    } else {
+                        if (extension.startsWith("image")) {
+                            ivFileType.setImageResource(R.drawable.ic_image);
+                        } else if (extension.startsWith("audio")) {
+                            ivFileType.setImageResource(R.drawable.ic_audiotrack);
+                        } else if (extension.startsWith("video")) {
+                            ivFileType.setImageResource(R.drawable.ic_videocam);
+                        } else {
+                            ivFileType.setImageResource(R.drawable.ic_style);
                         }
                     }
-                });
-                bViewFile.setEnabled(true);
+                }
             }
             if (receiverFileProgress.getTimeTaken() != 0) {
                 tvTimeTaken.setText(String.format("%.3f", receiverFileProgress.getTimeTaken() / Math.pow(10, 9)) + " sec");

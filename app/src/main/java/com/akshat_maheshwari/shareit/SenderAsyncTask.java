@@ -4,14 +4,22 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Created by Akshat Maheshwari on 16-11-2016.
@@ -52,8 +60,27 @@ public class SenderAsyncTask extends AsyncTask<ArrayList<File>, Long, Integer> {
                 dataOutputStream.writeUTF(f.getName());
             }
             for (File f: filesToBeSent) {
+                String zippedPath = "";
+                boolean isZipped = false;
+
+                if (f.isDirectory()) {
+                    isZipped = true;
+                    File tmpDir = new File(Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/.tmp");
+                    if (!tmpDir.exists()) {
+                        tmpDir.mkdirs();
+                    }
+                    zippedPath = tmpDir.getAbsolutePath() + "/" + f.getName() + ".zip";
+                    zipFileAtPath(f.getAbsolutePath(), zippedPath);
+                    f = new File(zippedPath);
+                    System.out.println("sending zipped: " + true);
+                    dataOutputStream.writeBoolean(true);
+                } else {
+                    System.out.println("sending zipped: " + false);
+                    dataOutputStream.writeBoolean(false);
+                }
                 System.out.println("sending size: " + f.length());
                 dataOutputStream.writeLong(f.length());
+
                 System.out.println("sending file: " + f);
                 InputStream inputStream = contentResolver.openInputStream(Uri.parse("file://" + f.getAbsolutePath()));
                 if (inputStream != null) {
@@ -74,6 +101,14 @@ public class SenderAsyncTask extends AsyncTask<ArrayList<File>, Long, Integer> {
                     });
                     inputStream.close();
                 }
+
+                if (isZipped) {
+                    File file = new File(zippedPath);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }
+
                 successfulTransfers += 1;
                 i += 1;
             }
@@ -114,5 +149,81 @@ public class SenderAsyncTask extends AsyncTask<ArrayList<File>, Long, Integer> {
             ((SenderActivity) context).bDone.setEnabled(true);
             ((SenderActivity) context).bCancel.setEnabled(false);
         }
+    }
+
+    /*
+    * Zips a file at a location and places the resulting zip file at the toLocation
+    * Example: zipFileAtPath("downloads/myfolder", "downloads/myFolder.zip");
+    */
+    private boolean zipFileAtPath(String sourcePath, String toLocation) {
+        final int BUFFER = 2048;
+
+        File sourceFile = new File(sourcePath);
+        try {
+            BufferedInputStream origin = null;
+            FileOutputStream dest = new FileOutputStream(toLocation);
+            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
+            if (sourceFile.isDirectory()) {
+                zipFolder(out, sourceFile, sourceFile.getParent().length());
+            } else {
+                byte data[] = new byte[BUFFER];
+                FileInputStream fi = new FileInputStream(sourcePath);
+                origin = new BufferedInputStream(fi, BUFFER);
+                ZipEntry entry = new ZipEntry(getLastPathComponent(sourcePath));
+                out.putNextEntry(entry);
+                int count;
+                while ((count = origin.read(data, 0, BUFFER)) != -1) {
+                    out.write(data, 0, count);
+                }
+            }
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /*
+     * Zips a subfolder
+     */
+    private void zipFolder(ZipOutputStream out, File folder, int basePathLength) throws IOException {
+        final int BUFFER = 2048;
+
+        File[] fileList = folder.listFiles();
+        BufferedInputStream origin = null;
+        for (File file : fileList) {
+            if (file.isDirectory()) {
+                zipFolder(out, file, basePathLength);
+            } else {
+                byte data[] = new byte[BUFFER];
+                String unmodifiedFilePath = file.getPath();
+                String relativePath = unmodifiedFilePath
+                        .substring(basePathLength);
+                FileInputStream fi = new FileInputStream(unmodifiedFilePath);
+                origin = new BufferedInputStream(fi, BUFFER);
+                ZipEntry entry = new ZipEntry(relativePath);
+                out.putNextEntry(entry);
+                int count;
+                while ((count = origin.read(data, 0, BUFFER)) != -1) {
+                    out.write(data, 0, count);
+                }
+                origin.close();
+            }
+        }
+    }
+
+    /*
+     * gets the last path component
+     *
+     * Example: getLastPathComponent("downloads/example/fileToZip");
+     * Result: "fileToZip"
+     */
+    private String getLastPathComponent(String filePath) {
+        String[] segments = filePath.split("/");
+        if (segments.length == 0) {
+            return "";
+        }
+        return segments[segments.length - 1];
     }
 }
