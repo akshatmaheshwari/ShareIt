@@ -6,12 +6,12 @@ import java.io.File;
  * Created by Akshat Maheshwari on 17-11-2016.
  */
 
-public class FileProgress {
+public class SenderFileProgress {
     private File file;
     private long bytesSent;
     private long timeTaken;
 
-    public FileProgress(File file) {
+    public SenderFileProgress(File file) {
         this.file = file;
         this.bytesSent = 0;
         this.timeTaken = 0;

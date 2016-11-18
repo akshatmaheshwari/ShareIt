@@ -58,7 +58,7 @@ public class SenderAsyncTask extends AsyncTask<ArrayList<File>, Long, Integer> {
                 InputStream inputStream = contentResolver.openInputStream(Uri.parse("file://" + f.getAbsolutePath()));
                 if (inputStream != null) {
                     long bytesSent = 0;
-                    final FileProgress senderFileProgress = ((SenderActivity) context).senderFileListAdapter.senderFileProgressArrayList.get(i);
+                    final SenderFileProgress senderFileProgress = ((SenderActivity) context).senderFileListAdapter.senderFileProgressArrayList.get(i);
                     final long startTime = System.nanoTime();
                     while ((len = inputStream.read(buf)) != -1) {
                         outputStream.write(buf, 0, len);

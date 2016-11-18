@@ -48,7 +48,7 @@ public class FileListAdapter extends ArrayAdapter<File> {
         if (file != null) {
             TextView tvFileName = (TextView) v.findViewById(R.id.tvFileName);
             ImageView ivFileType = (ImageView) v.findViewById(R.id.ivFileType);
-            CheckBox cbToBeSent = (CheckBox) v.findViewById(R.id.cbToBeSent);
+            final CheckBox cbToBeSent = (CheckBox) v.findViewById(R.id.cbToBeSent);
 
             tvFileName.setText(file.getName());
             if (file.isDirectory()) {
@@ -81,15 +81,13 @@ public class FileListAdapter extends ArrayAdapter<File> {
                 @Override
                 public void onClick(View view) {
                     if (file.isDirectory()) {
-                        /*Intent intent = new Intent(context, DisplayFilesActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("directoryPath", file.getAbsolutePath());
-                        intent.putExtras(bundle);
-                        context.startActivity(intent);*/
                         files = ((DisplayFilesActivity) context).getVisibleFiles(file.getAbsolutePath());
                         ((DisplayFilesActivity) context).currentDirectoryPath = file.getAbsolutePath();
                         notifyDataSetChanged();
+                    } else {
+                        cbToBeSent.toggle();
                     }
+                    ((DisplayFilesActivity) context).tvCurrentFolder.setText(((DisplayFilesActivity) context).currentDirectoryPath);
                 }
             });
 

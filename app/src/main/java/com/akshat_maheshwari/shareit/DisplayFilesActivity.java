@@ -7,10 +7,14 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,7 +26,8 @@ import java.util.Set;
 
 public class DisplayFilesActivity extends AppCompatActivity {
     ListView lvFiles;
-    TextView tvFolderEmpty;
+    TextView tvFolderEmpty, tvCurrentFolder;
+    HorizontalScrollView hsvFolderScroll;
     Button bSend, bCancel;
 
     FileListAdapter fileListAdapter;
@@ -37,12 +42,38 @@ public class DisplayFilesActivity extends AppCompatActivity {
 
         lvFiles = (ListView) findViewById(R.id.lvFiles);
         tvFolderEmpty = (TextView) findViewById(R.id.tvFolderEmpty);
+        tvCurrentFolder = (TextView) findViewById(R.id.tvCurrentFolder);
+        hsvFolderScroll = (HorizontalScrollView) findViewById(R.id.hsvFolderScroll);
         bSend = (Button) findViewById(R.id.bSend);
         bCancel = (Button) findViewById(R.id.bCancel);
 
         currentDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         fileListAdapter = new FileListAdapter(this, R.layout.file_list_item, getVisibleFiles(currentDirectoryPath));
         lvFiles.setAdapter(fileListAdapter);
+        tvCurrentFolder.setText(currentDirectoryPath);
+
+        // make tvCurrentFolder scroll to end whenever folder changes
+        tvCurrentFolder.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                hsvFolderScroll.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        hsvFolderScroll.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+                    }
+                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         filesToBeSentSet = new ArrayList<>();
 
@@ -85,12 +116,6 @@ public class DisplayFilesActivity extends AppCompatActivity {
         return retFiles;
     }
 
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
-    }
-
     @Override
     public void onBackPressed() {
         if (currentDirectoryPath.equals(Environment.getExternalStorageDirectory().getAbsolutePath())) {
@@ -99,6 +124,7 @@ public class DisplayFilesActivity extends AppCompatActivity {
             fileListAdapter.files = getVisibleFiles(currentDirectoryPath.substring(0, currentDirectoryPath.lastIndexOf('/')));
             currentDirectoryPath = currentDirectoryPath.substring(0, currentDirectoryPath.lastIndexOf('/'));
             fileListAdapter.notifyDataSetChanged();
+            tvCurrentFolder.setText(currentDirectoryPath);
         }
     }
 

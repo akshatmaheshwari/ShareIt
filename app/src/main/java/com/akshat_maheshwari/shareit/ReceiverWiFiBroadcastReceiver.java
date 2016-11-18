@@ -59,7 +59,10 @@ public class ReceiverWiFiBroadcastReceiver extends BroadcastReceiver {
                         Toast.makeText(receiverActivity.getApplicationContext(), String.valueOf(wifiP2pInfo.groupOwnerAddress == null), Toast.LENGTH_SHORT).show();
                         if (wifiP2pInfo.groupOwnerAddress != null) {
                             Toast.makeText(receiverActivity.getApplicationContext(), "connected" + wifiP2pInfo.groupOwnerAddress.getHostAddress(), Toast.LENGTH_SHORT).show();
-                            receiverActivity.receiverAsyncTask = new ReceiverAsyncTask(receiverActivity/*, receiverActivity.tvStatus*/);
+//                            ArrayList<String> filesToBeReceived = new ArrayList<String>();
+                            receiverActivity.receiverAsyncTask = new ReceiverAsyncTask(receiverActivity);
+//                            receiverActivity.receiverFileListAdapter = new ReceiverFileListAdapter(receiverActivity.getApplicationContext(), R.layout.receiver_file_progress_list_item, filesToBeReceived);
+//                            receiverActivity.lvStatus.setAdapter(receiverActivity.receiverFileListAdapter);
                             System.out.println("before exec");
                             receiverActivity.tvWaitingForSender.setVisibility(View.INVISIBLE);
                             receiverActivity.receiverAsyncTask.execute();

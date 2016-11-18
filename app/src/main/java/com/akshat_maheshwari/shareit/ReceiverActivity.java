@@ -32,14 +32,14 @@ public class ReceiverActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receiver);
 
-        lvStatus = (ListView) findViewById(R.id.lvStatus);
+        lvStatus = (ListView) findViewById(R.id.lvReceiverStatus);
         tvWaitingForSender = (TextView) findViewById(R.id.tvWaitingForSender);
         bCancel = (Button) findViewById(R.id.bCancel);
         bDone = (Button) findViewById(R.id.bDone);
 
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
-        broadcastReceiver = new ReceiverWiFiBroadcastReceiver(wifiP2pManager, channel, this);
+        broadcastReceiver = new ReceiverWiFiBroadcastReceiver(wifiP2pManager, channel, ReceiverActivity.this);
         intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);

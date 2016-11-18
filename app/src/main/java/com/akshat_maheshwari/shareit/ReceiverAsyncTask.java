@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
  */
 public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
     private Context context;
+    private ArrayList<String> filesToBeReceived;
 
     public ReceiverAsyncTask(Context context) {
         this.context = context;
@@ -38,7 +40,9 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
              * call blocks until a connection is accepted from a client
              */
             System.out.println("before socket connects");
-            receiverSocket = new ServerSocket(33440);
+            receiverSocket = new ServerSocket();
+            receiverSocket.setReuseAddress(true);
+            receiverSocket.bind(new InetSocketAddress(33440));
             senderSocket = receiverSocket.accept();
             System.out.println("socket connected");
 
@@ -50,25 +54,26 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
             DataInputStream dataInputStream = new DataInputStream(inputStream);
             int noOfFiles = dataInputStream.readInt();
             System.out.println(noOfFiles);
-            final ArrayList<String> fileNamesArrayList = new ArrayList<>();
+            filesToBeReceived = new ArrayList<>();
             for (int i = 0; i < noOfFiles; ++i) {
-                String fileName = dataInputStream.readUTF();
+                final String fileName = dataInputStream.readUTF();
                 System.out.println("fileName: " + fileName);
-                fileNamesArrayList.add(fileName);
+                filesToBeReceived.add(fileName);
             }
-            if (context instanceof ReceiverActivity) {
-                ((ReceiverActivity) context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((ReceiverActivity) context).receiverFileListAdapter = new ReceiverFileListAdapter(context, R.layout.receiver_file_progress_list_item, fileNamesArrayList);
-                        ((ReceiverActivity) context).lvStatus.setAdapter(((ReceiverActivity) context).receiverFileListAdapter);
-                    }
-                });
-            }
+            System.out.println(filesToBeReceived);
+            ((ReceiverActivity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ((ReceiverActivity) context).receiverFileListAdapter = new ReceiverFileListAdapter(context, R.layout.receiver_file_progress_list_item, filesToBeReceived);
+                    ((ReceiverActivity) context).lvStatus.setAdapter(((ReceiverActivity) context).receiverFileListAdapter);
+                    System.out.println(((ReceiverActivity) context).receiverFileListAdapter.getCount());
+                    System.out.println(((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.size());
+                }
+            });
             for (int i = 0; i < noOfFiles; ++i) {
                 long fileSize = dataInputStream.readLong();
                 System.out.println("fileSize: " + fileSize);
-                final File file = new File(Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/" + fileNamesArrayList.get(i));
+                final File file = new File(Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/" + filesToBeReceived.get(i));
                 File dirs = new File(file.getParent());
                 if (!dirs.exists()) {
                     dirs.mkdirs();
@@ -77,15 +82,22 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
                 final long startTime = System.nanoTime();
                 copyFile(inputStream, new FileOutputStream(file), fileSize, i);
                 if (context instanceof ReceiverActivity) {
-                    final ReceiverFileProgress receiverFileProgress = ((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.get(i);
-                    ((ReceiverActivity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            receiverFileProgress.setTimeTaken(System.nanoTime() - startTime);
-                            receiverFileProgress.setFile(file);
-                            ((ReceiverActivity) context).receiverFileListAdapter.notifyDataSetChanged();
-                        }
-                    });
+                    try {
+                        final ReceiverFileProgress receiverFileProgress = ((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.get(i);
+                        ((ReceiverActivity) context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                System.out.println("in ui thread");
+                                receiverFileProgress.setTimeTaken(System.nanoTime() - startTime);
+                                receiverFileProgress.setFile(file);
+                                System.out.println("file: " + file);
+                                ((ReceiverActivity) context).receiverFileListAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    } catch (Exception e) {
+                        System.out.println(e.toString());
+                        e.printStackTrace();
+                    }
                 }
                 System.out.println(file.getAbsolutePath());
             }
@@ -105,8 +117,13 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
         int fileNo = values[0].intValue();
         long bytesSent = values[1];
         if (context instanceof ReceiverActivity) {
-            ((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.get(fileNo).setBytesSent(bytesSent);
-            ((ReceiverActivity) context).receiverFileListAdapter.notifyDataSetChanged();
+            try {
+                ((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.get(fileNo).setBytesSent(bytesSent);
+                ((ReceiverActivity) context).receiverFileListAdapter.notifyDataSetChanged();
+            } catch (Exception e) {
+                System.out.println(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 

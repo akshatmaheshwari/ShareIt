@@ -11,12 +11,13 @@
         android:layout_height="match_parent"
         android:id="@+id/tvWaitingForSender"
         android:text="Waiting for sender..."
+        android:textSize="20sp"
         android:gravity="center" />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/lvStatus"
+        android:id="@+id/lvReceiverStatus"
         android:layout_above="@+id/llButtons" />
 
     <LinearLayout

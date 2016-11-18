@@ -17,14 +17,14 @@ import java.util.ArrayList;
 
 public class SenderFileListAdapter extends ArrayAdapter<File> {
     Context context;
-    ArrayList<FileProgress> senderFileProgressArrayList;
+    ArrayList<SenderFileProgress> senderFileProgressArrayList;
 
     public SenderFileListAdapter(Context context, int resource, ArrayList<File> objects) {
         super(context, resource, objects);
         this.context = context;
         this.senderFileProgressArrayList = new ArrayList<>();
         for (File f: objects) {
-            this.senderFileProgressArrayList.add(new FileProgress(f));
+            this.senderFileProgressArrayList.add(new SenderFileProgress(f));
         }
     }
 
@@ -42,7 +42,7 @@ public class SenderFileListAdapter extends ArrayAdapter<File> {
         TextView tvFileSentPercentage = (TextView) view.findViewById(R.id.tvFileSentPercentage);
         TextView tvTimeTaken = (TextView) view.findViewById(R.id.tvTimeTaken);
 
-        FileProgress senderFileProgress = senderFileProgressArrayList.get(position);
+        SenderFileProgress senderFileProgress = senderFileProgressArrayList.get(position);
         if (senderFileProgress != null) {
             tvFileName.setText(senderFileProgress.getFile().getName());
             tvFileSentPercentage.setText((senderFileProgress.getBytesSent() / senderFileProgress.getFile().length()) * 100 + "% sent");
