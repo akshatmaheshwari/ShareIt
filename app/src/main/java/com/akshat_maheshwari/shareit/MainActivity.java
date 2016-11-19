@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
 
         menuInflater.inflate(R.menu.settings_menu, menu);
-
+        // set menu item colour to white
         Drawable drawable = menu.findItem(R.id.mSettings).getIcon();
         if (drawable != null) {
             drawable.mutate();

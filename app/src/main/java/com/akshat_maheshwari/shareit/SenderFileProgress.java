@@ -8,11 +8,13 @@ import java.io.File;
 
 public class SenderFileProgress {
     private File file;
+    private long fileSize;
     private long bytesSent;
     private long timeTaken;
 
     public SenderFileProgress(File file) {
         this.file = file;
+        this.fileSize = file.length();
         this.bytesSent = 0;
         this.timeTaken = 0;
     }
@@ -23,6 +25,14 @@ public class SenderFileProgress {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
     }
 
     public long getBytesSent() {

@@ -31,11 +31,13 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
     private ArrayList<String> filesToBeReceived;
 
     public ReceiverAsyncTask(Context context) {
+        System.out.println("in ReceiverAsyncTask ctor");
         this.context = context;
     }
 
     @Override
     protected Integer doInBackground(Object[] objects) {
+        System.out.println("in doInBackground");
         ServerSocket receiverSocket;
         Socket senderSocket;
         int successfulTransfers = 0;
@@ -48,6 +50,7 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
             receiverSocket = new ServerSocket();
             receiverSocket.setReuseAddress(true);
             receiverSocket.bind(new InetSocketAddress(33440));
+            System.out.println("socket waiting");
             senderSocket = receiverSocket.accept();
             System.out.println("socket connected");
 
@@ -58,11 +61,11 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
             InputStream inputStream = senderSocket.getInputStream();
             DataInputStream dataInputStream = new DataInputStream(inputStream);
             int noOfFiles = dataInputStream.readInt();
-            System.out.println(noOfFiles);
+            System.out.println("noOfFiles: " + noOfFiles);
             filesToBeReceived = new ArrayList<>();
             for (int i = 0; i < noOfFiles; ++i) {
                 final String fileName = dataInputStream.readUTF();
-                System.out.println("fileName: " + fileName);
+                System.out.println("received fileName: " + fileName);
                 filesToBeReceived.add(fileName);
             }
             System.out.println(filesToBeReceived);
@@ -78,8 +81,16 @@ public class ReceiverAsyncTask extends AsyncTask<Object, Long, Integer> {
             for (int i = 0; i < noOfFiles; ++i) {
                 boolean isZipped = dataInputStream.readBoolean();
                 System.out.println("isZipped: " + isZipped);
-                long fileSize = dataInputStream.readLong();
+                final long fileSize = dataInputStream.readLong();
                 System.out.println("fileSize: " + fileSize);
+                final int i1 = i;
+                ((ReceiverActivity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((ReceiverActivity) context).receiverFileListAdapter.receiverFileProgressArrayList.get(i1).setFileSize(fileSize);
+                        ((ReceiverActivity) context).receiverFileListAdapter.notifyDataSetChanged();
+                    }
+                });
                 File file = new File(Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/" + filesToBeReceived.get(i));
                 File dirs = new File(file.getParent());
                 if (!dirs.exists()) {

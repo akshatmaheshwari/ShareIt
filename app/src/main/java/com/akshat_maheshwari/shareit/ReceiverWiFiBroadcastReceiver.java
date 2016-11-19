@@ -50,9 +50,9 @@ public class ReceiverWiFiBroadcastReceiver extends BroadcastReceiver {
             System.out.println("receiver: WIFI_P2P_PEERS_CHANGED_ACTION");
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             System.out.println("receiver: WIFI_P2P_CONNECTION_CHANGED_ACTION");
-            NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+            NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+            System.out.println("networkInfo.isConnected(): " + networkInfo.isConnected());
             if (networkInfo.isConnected()) {
-                System.out.println("connected");
                 wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {

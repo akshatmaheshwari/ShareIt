@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -12,6 +15,9 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -68,12 +74,14 @@ public class PeerChooserActivity extends AppCompatActivity {
                 wifiP2pManager.connect(channel, wifiP2pConfig, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(getApplicationContext(), "Successfully connected", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(), "Successfully connected", Toast.LENGTH_SHORT).show();
+                        System.out.println("pca connect: Successfully connected");
                     }
 
                     @Override
                     public void onFailure(int i) {
-                        Toast.makeText(getApplicationContext(), "Failed to connect", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(), "Failed to connect", Toast.LENGTH_SHORT).show();
+                        System.out.println("pca connect: Failed to connect = " + i);
                     }
                 });
             }
@@ -127,5 +135,28 @@ public class PeerChooserActivity extends AppCompatActivity {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(false);
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+
+        menuInflater.inflate(R.menu.refresh_peers_menu, menu);
+        // set menu item colour to white
+        Drawable drawable = menu.findItem(R.id.mRefreshPeers).getIcon();
+        if (drawable != null) {
+            drawable.mutate();
+            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.mRefreshPeers) {
+            discoverPeersTillSuccess();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

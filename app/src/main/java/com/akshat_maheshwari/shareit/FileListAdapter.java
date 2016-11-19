@@ -84,8 +84,6 @@ public class FileListAdapter extends ArrayAdapter<File> {
                         files = ((DisplayFilesActivity) context).getVisibleFiles(file.getAbsolutePath());
                         ((DisplayFilesActivity) context).currentDirectoryPath = file.getAbsolutePath();
                         notifyDataSetChanged();
-                    } else {
-                        cbToBeSent.toggle();
                     }
                     ((DisplayFilesActivity) context).tvCurrentFolder.setText(((DisplayFilesActivity) context).currentDirectoryPath);
                 }

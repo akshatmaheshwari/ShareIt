@@ -9,6 +9,7 @@ import java.io.File;
 public class ReceiverFileProgress {
     private String fileName;
     private File file;
+    private long fileSize;
     private long bytesSent;
     private long timeTaken;
 
@@ -32,6 +33,14 @@ public class ReceiverFileProgress {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
     }
 
     public long getBytesSent() {

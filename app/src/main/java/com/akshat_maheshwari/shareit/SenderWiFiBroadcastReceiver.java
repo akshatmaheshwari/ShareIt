@@ -77,9 +77,17 @@ public class SenderWiFiBroadcastReceiver extends BroadcastReceiver {
                 wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
-                        System.out.println(wifiP2pInfo.groupOwnerAddress == null);
+                        System.out.println("wifiP2pInfo.groupFormed: " + wifiP2pInfo.groupFormed);
+                        System.out.println("wifiP2pInfo.groupOwnerAddress == null: " + (wifiP2pInfo.groupOwnerAddress == null));
+                        try {
+                            System.out.println("sleep for 1sec");
+                            Thread.sleep(1000);
+                            System.out.println("slept for 1sec");
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         if (wifiP2pInfo.groupOwnerAddress != null) {
-                            Toast.makeText(peerChooserActivity.getApplicationContext(), wifiP2pInfo.groupOwnerAddress.getHostAddress(), Toast.LENGTH_SHORT).show();
+                            System.out.println("groupOwnerAddress: " + wifiP2pInfo.groupOwnerAddress.getHostAddress());
                             Intent senderActivityIntent = new Intent(context, SenderActivity.class);
                             senderActivityIntent.putExtra("filesToBeSent", peerChooserActivity.getIntent().getSerializableExtra("filesToBeSent"));
                             senderActivityIntent.putExtra("serverIP", wifiP2pInfo.groupOwnerAddress.getHostAddress());

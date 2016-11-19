@@ -33,7 +33,7 @@ public class ReceiverFileListAdapter extends ArrayAdapter<String> {
         for (String f: objects) {
             this.receiverFileProgressArrayList.add(new ReceiverFileProgress(f));
         }
-        System.out.println(this.receiverFileProgressArrayList);
+        System.out.println("in ReceiverFileListAdapter ctor: " + this.receiverFileProgressArrayList);
     }
 
     @NonNull
@@ -57,9 +57,8 @@ public class ReceiverFileListAdapter extends ArrayAdapter<String> {
         if (receiverFileProgress != null) {
             tvFileName.setText(receiverFileProgress.getFileName());
             System.out.println("ad: " + receiverFileProgress.getFileName());
-            System.out.println("ad: " + receiverFileProgress.getFile() == null);
             if (receiverFileProgress.getFile() != null) {
-                tvFileReceivedPercentage.setText((receiverFileProgress.getBytesSent() / receiverFileProgress.getFile().length()) * 100 + "% received");
+                tvFileReceivedPercentage.setText((receiverFileProgress.getBytesSent() / receiverFileProgress.getFileSize()) * 100 + "% received");
                 if (!receiverFileProgress.getFile().isDirectory()) {
                     bViewFile.setOnClickListener(new View.OnClickListener() {
                         @Override

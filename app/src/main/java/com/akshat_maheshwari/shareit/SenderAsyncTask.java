@@ -46,6 +46,9 @@ public class SenderAsyncTask extends AsyncTask<ArrayList<File>, Long, Integer> {
 
         try {
             socket.bind(null);
+            socket.setReuseAddress(true);
+
+            System.out.println("try: connecting");
             socket.connect(new InetSocketAddress(serverIP, 33440), 5000);
             System.out.println("try: connected");
 
@@ -72,6 +75,17 @@ public class SenderAsyncTask extends AsyncTask<ArrayList<File>, Long, Integer> {
                     zippedPath = tmpDir.getAbsolutePath() + "/" + f.getName() + ".zip";
                     zipFileAtPath(f.getAbsolutePath(), zippedPath);
                     f = new File(zippedPath);
+                    final File f1 = new File(f.getAbsolutePath());
+                    final int i1 = i;
+                    ((SenderActivity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((SenderActivity) context).senderFileListAdapter.senderFileProgressArrayList.get(i1).setFile(f1);
+                            System.out.println("f1.length(): " + f1.length());
+                            ((SenderActivity) context).senderFileListAdapter.senderFileProgressArrayList.get(i1).setFileSize(f1.length());
+                            ((SenderActivity) context).senderFileListAdapter.notifyDataSetChanged();
+                        }
+                    });
                     System.out.println("sending zipped: " + true);
                     dataOutputStream.writeBoolean(true);
                 } else {
@@ -198,8 +212,7 @@ public class SenderAsyncTask extends AsyncTask<ArrayList<File>, Long, Integer> {
             } else {
                 byte data[] = new byte[BUFFER];
                 String unmodifiedFilePath = file.getPath();
-                String relativePath = unmodifiedFilePath
-                        .substring(basePathLength);
+                String relativePath = unmodifiedFilePath.substring(basePathLength);
                 FileInputStream fi = new FileInputStream(unmodifiedFilePath);
                 origin = new BufferedInputStream(fi, BUFFER);
                 ZipEntry entry = new ZipEntry(relativePath);
