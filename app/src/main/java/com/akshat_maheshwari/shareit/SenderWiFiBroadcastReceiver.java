@@ -3,19 +3,19 @@ package com.akshat_maheshwari.shareit;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
+import android.provider.MediaStore;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -89,7 +89,29 @@ public class SenderWiFiBroadcastReceiver extends BroadcastReceiver {
                         if (wifiP2pInfo.groupOwnerAddress != null) {
                             System.out.println("groupOwnerAddress: " + wifiP2pInfo.groupOwnerAddress.getHostAddress());
                             Intent senderActivityIntent = new Intent(context, SenderActivity.class);
-                            senderActivityIntent.putExtra("filesToBeSent", peerChooserActivity.getIntent().getSerializableExtra("filesToBeSent"));
+
+                            Intent otherAppIntent = peerChooserActivity.getIntent();
+                            if (otherAppIntent.getAction() != null) {
+                                if (peerChooserActivity.getIntent().getAction().equals(Intent.ACTION_SEND)) {
+                                    ArrayList<File> filesToBeSent = new ArrayList<>();
+                                    System.out.println(otherAppIntent.getParcelableExtra(Intent.EXTRA_STREAM));
+                                    filesToBeSent.add(new File((getRealPathFromURI(context, (Uri) otherAppIntent.getParcelableExtra(Intent.EXTRA_STREAM)))));
+                                    senderActivityIntent.putExtra("filesToBeSent", filesToBeSent);
+                                } else if (otherAppIntent.getAction().equals(Intent.ACTION_SEND_MULTIPLE)) {
+                                    ArrayList<File> filesToBeSent = new ArrayList<>();
+                                    System.out.println(otherAppIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM));
+                                    ArrayList<Uri> uriArrayList = otherAppIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+                                    for (int i = 0; i < uriArrayList.size(); ++i) {
+                                        System.out.println(getRealPathFromURI(context, uriArrayList.get(i)));
+                                        filesToBeSent.add(new File(getRealPathFromURI(context, uriArrayList.get(i))));
+                                    }
+                                    senderActivityIntent.putExtra("filesToBeSent", filesToBeSent);
+                                }
+                            } else {
+                                senderActivityIntent.putExtra("filesToBeSent", peerChooserActivity.getIntent().getSerializableExtra("filesToBeSent"));
+                            }
+
+
                             senderActivityIntent.putExtra("serverIP", wifiP2pInfo.groupOwnerAddress.getHostAddress());
                             context.startActivity(senderActivityIntent);
                         }
@@ -100,6 +122,21 @@ public class SenderWiFiBroadcastReceiver extends BroadcastReceiver {
             }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             System.out.println("receiver: WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
+        }
+    }
+
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 }

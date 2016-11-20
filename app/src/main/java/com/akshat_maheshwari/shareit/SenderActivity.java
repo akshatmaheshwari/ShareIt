@@ -1,22 +1,13 @@
 package com.akshat_maheshwari.shareit;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 
 public class SenderActivity extends AppCompatActivity {

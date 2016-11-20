@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.view.View;
@@ -56,7 +55,6 @@ public class ReceiverWiFiBroadcastReceiver extends BroadcastReceiver {
                 wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
-                        Toast.makeText(receiverActivity.getApplicationContext(), String.valueOf(wifiP2pInfo.groupOwnerAddress == null), Toast.LENGTH_SHORT).show();
                         if (wifiP2pInfo.groupOwnerAddress != null) {
                             Toast.makeText(receiverActivity.getApplicationContext(), "connected" + wifiP2pInfo.groupOwnerAddress.getHostAddress(), Toast.LENGTH_SHORT).show();
 //                            ArrayList<String> filesToBeReceived = new ArrayList<String>();

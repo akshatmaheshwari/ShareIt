@@ -49,7 +49,9 @@ public class SenderFileListAdapter extends ArrayAdapter<File> {
         if (senderFileProgress != null) {
             tvFileName.setText(senderFileProgress.getFile().getName());
             System.out.println(senderFileProgress.getFileSize());
-            tvFileSentPercentage.setText((senderFileProgress.getBytesSent() / senderFileProgress.getFileSize() * 100 + "% sent"));
+            if (senderFileProgress.getFileSize() != 0) {
+                tvFileSentPercentage.setText((senderFileProgress.getBytesSent() / senderFileProgress.getFileSize() * 100 + "% sent"));
+            }
             if (senderFileProgress.getTimeTaken() != 0) {
                 tvTimeTaken.setText(String.format("%.3f", senderFileProgress.getTimeTaken() / Math.pow(10, 9)) + " sec");
             }
